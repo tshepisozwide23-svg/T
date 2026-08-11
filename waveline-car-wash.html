@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waveline Car Wash — Drive in dull. Drive out gleaming.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0B1F2A;
+    --ink-deep:#071620;
+    --foam:#F2F7F6;
+    --aqua:#35C2C1;
+    --aqua-bright:#5FE0DE;
+    --suds:#FFC93C;
+    --chrome:#8FA6AC;
+    --line: rgba(143,166,172,0.25);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--foam);
+    font-family:'Work Sans', sans-serif;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    letter-spacing:-0.02em;
+  }
+  .mono{
+    font-family:'JetBrains Mono', monospace;
+    letter-spacing:0.02em;
+  }
+  a{color:inherit; text-decoration:none;}
+  ::selection{background:var(--suds); color:var(--ink-deep);}
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--suds);
+    outline-offset:3px;
+  }
+
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+
+  /* NAV */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    background:rgba(11,31,42,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 24px; max-width:1180px; margin:0 auto;
+  }
+  .logo{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:1.3rem; letter-spacing:-0.02em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo-mark{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--aqua-bright);
+    box-shadow:0 0 12px var(--aqua-bright);
+  }
+  .nav-links{display:flex; gap:32px; font-size:0.95rem; color:var(--chrome);}
+  .nav-links a:hover{color:var(--foam);}
+  .nav-cta{
+    background:var(--suds); color:var(--ink-deep);
+    padding:10px 20px; border-radius:100px;
+    font-weight:600; font-size:0.9rem;
+    border:none; cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .nav-cta:hover{transform:translateY(-1px);}
+  .menu-toggle{display:none; background:none; border:none; color:var(--foam); font-size:1.5rem;}
+
+  @media(max-width:760px){
+    .nav-links{display:none;}
+    .menu-toggle{display:block;}
+  }
+
+  /* HERO */
+  .hero{
+    position:relative;
+    padding:180px 24px 100px;
+    max-width:1180px; margin:0 auto;
+    display:grid; grid-template-columns:1.1fr 1fr; gap:60px; align-items:center;
+  }
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr; padding-top:140px; gap:40px;}
+  }
+  .eyebrow{
+    font-size:0.8rem; color:var(--aqua-bright);
+    text-transform:uppercase; letter-spacing:0.15em;
+    margin-bottom:18px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{
+    content:''; width:24px; height:1px; background:var(--aqua-bright);
+  }
+  .hero h1{
+    font-size:clamp(2.4rem, 5.2vw, 4.2rem);
+    line-height:1.02;
+    margin-bottom:24px;
+  }
+  .hero h1 .accent{color:var(--aqua-bright);}
+  .hero p{
+    color:var(--chrome); font-size:1.1rem; max-width:460px; margin-bottom:36px;
+    line-height:1.6;
+  }
+  .hero-ctas{display:flex; gap:16px; flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--suds); color:var(--ink-deep);
+    padding:16px 30px; border-radius:100px; font-weight:600;
+    border:none; cursor:pointer; font-size:1rem;
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 0 0 rgba(255,201,60,0);
+  }
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 8px 24px rgba(255,201,60,0.25);}
+  .btn-ghost{
+    padding:16px 26px; border-radius:100px; font-weight:600;
+    border:1px solid var(--line); color:var(--foam);
+    cursor:pointer; background:none; font-size:1rem;
+  }
+  .btn-ghost:hover{border-color:var(--aqua-bright); color:var(--aqua-bright);}
+
+  /* SIGNATURE: squeegee shine wipe */
+  .shine-stage{
+    position:relative;
+    aspect-ratio:4/5;
+    border-radius:20px;
+    overflow:hidden;
+    cursor:none;
+    border:1px solid var(--line);
+    background:#0d2530;
+  }
+  .shine-layer{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+    gap:10px;
+  }
+  .layer-dull{
+    background:
+      linear-gradient(180deg, #14313e, #0a1e28);
+    filter:saturate(0.5) brightness(0.75);
+  }
+  .layer-shine{
+    background:
+      radial-gradient(circle at 30% 20%, rgba(95,224,222,0.35), transparent 55%),
+      linear-gradient(160deg, #123844, #0c2733 60%, #0a2028);
+    clip-path: circle(120px at 50% 50%);
+    transition: clip-path .05s linear;
+  }
+  .car-silhouette{
+    width:72%;
+    opacity:0.92;
+  }
+  .shine-caption{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    color:var(--chrome);
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+  }
+  .layer-shine .shine-caption{color:var(--aqua-bright);}
+  .shine-hint{
+    position:absolute; bottom:18px; left:0; right:0;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.7rem;
+    color:var(--chrome);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    opacity:0.8;
+    pointer-events:none;
+  }
+  .cursor-dot{
+    position:absolute; width:14px; height:14px; border-radius:50%;
+    border:2px solid var(--aqua-bright);
+    background:rgba(95,224,222,0.15);
+    pointer-events:none;
+    transform:translate(-50%,-50%);
+    display:none;
+  }
+
+  /* TICKET STRIP (stats) */
+  .ticket-strip{
+    border-top:1px dashed var(--line);
+    border-bottom:1px dashed var(--line);
+    padding:28px 24px;
+  }
+  .ticket-inner{
+    max-width:1180px; margin:0 auto;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px;
+  }
+  .ticket-stat{text-align:left;}
+  .ticket-stat .num{
+    font-family:'Space Grotesk', sans-serif;
+    font-size:1.9rem; font-weight:700; color:var(--aqua-bright);
+  }
+  .ticket-stat .label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
+    color:var(--chrome); margin-top:4px;
+  }
+
+  /* SECTION HEADERS */
+  section{padding:110px 0;}
+  .section-head{
+    max-width:640px; margin-bottom:60px;
+  }
+  .section-head .eyebrow{margin-bottom:14px;}
+  .section-head h2{font-size:clamp(1.8rem, 3.4vw, 2.6rem); margin-bottom:16px;}
+  .section-head p{color:var(--chrome); font-size:1.05rem; line-height:1.6;}
+
+  /* PACKAGES — menu board */
+  .board{
+    border:1px solid var(--line);
+    border-radius:24px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    overflow:hidden;
+  }
+  .board-row{
+    display:grid; grid-template-columns:1.3fr 2fr 0.9fr 0.7fr;
+    gap:20px; align-items:center;
+    padding:28px 32px;
+    border-bottom:1px solid var(--line);
+    transition:background .2s ease;
+  }
+  .board-row:last-child{border-bottom:none;}
+  .board-row:hover{background:rgba(53,194,193,0.05);}
+  .board-row.head{
+    color:var(--chrome); font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em;
+    padding:18px 32px;
+  }
+  .pkg-name{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:1.15rem;}
+  .pkg-name .tag{
+    display:inline-block; margin-left:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.65rem; color:var(--ink-deep);
+    background:var(--suds); padding:3px 8px; border-radius:100px;
+    text-transform:uppercase; letter-spacing:0.06em;
+    vertical-align:middle;
+  }
+  .pkg-desc{color:var(--chrome); font-size:0.92rem; line-height:1.5;}
+  .pkg-time{font-family:'JetBrains Mono', monospace; color:var(--chrome); font-size:0.85rem;}
+  .pkg-price{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.3rem; text-align:right;}
+  @media(max-width:760px){
+    .board-row{grid-template-columns:1fr; gap:8px; padding:24px;}
+    .board-row.head{display:none;}
+    .pkg-price{text-align:left;}
+  }
+
+  /* HOW IT WORKS */
+  .steps{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:2px;
+    background:var(--line); border:1px solid var(--line); border-radius:20px;
+    overflow:hidden;
+  }
+  .step{
+    background:var(--ink); padding:40px 32px;
+    position:relative;
+  }
+  .step .step-num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.8rem; color:var(--aqua-bright);
+    margin-bottom:20px; display:block;
+  }
+  .step h3{font-size:1.2rem; margin-bottom:10px;}
+  .step p{color:var(--chrome); font-size:0.95rem; line-height:1.6;}
+  @media(max-width:760px){
+    .steps{grid-template-columns:1fr;}
+  }
+
+  /* LOCATIONS */
+  .locations-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:20px;
+  }
+  .loc-card{
+    border:1px solid var(--line); border-radius:16px; padding:26px;
+  }
+  .loc-card h3{font-size:1.05rem; margin-bottom:6px;}
+  .loc-card .addr{color:var(--chrome); font-size:0.9rem; margin-bottom:14px;}
+  .loc-card .hours{font-family:'JetBrains Mono', monospace; font-size:0.78rem; color:var(--aqua-bright);}
+  @media(max-width:760px){.locations-grid{grid-template-columns:1fr;}}
+
+  /* TESTIMONIALS */
+  .testimonial-row{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+  }
+  .t-card{
+    border:1px solid var(--line); border-radius:16px; padding:28px;
+    background:rgba(255,255,255,0.015);
+  }
+  .t-card p{font-size:0.98rem; line-height:1.6; margin-bottom:18px;}
+  .t-card .who{font-family:'JetBrains Mono', monospace; font-size:0.78rem; color:var(--chrome);}
+  @media(max-width:900px){.testimonial-row{grid-template-columns:1fr;}}
+
+  /* FINAL CTA */
+  .cta-band{
+    background:linear-gradient(135deg, #0c2b34, #0a1e28);
+    border:1px solid var(--line);
+    border-radius:28px;
+    padding:70px 50px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .cta-band::before{
+    content:'';
+    position:absolute; inset:-40%;
+    background:radial-gradient(circle, rgba(53,194,193,0.18), transparent 60%);
+    animation:drift 10s ease-in-out infinite;
+  }
+  @keyframes drift{
+    0%,100%{transform:translate(0,0);}
+    50%{transform:translate(4%, 4%);}
+  }
+  .cta-band h2{font-size:clamp(1.8rem,3.6vw,2.6rem); margin-bottom:16px; position:relative;}
+  .cta-band p{color:var(--chrome); margin-bottom:32px; position:relative;}
+  .cta-band .btn-primary{position:relative;}
+
+  footer{
+    border-top:1px solid var(--line);
+    padding:50px 24px 30px;
+    color:var(--chrome); font-size:0.85rem;
+  }
+  .footer-inner{
+    max-width:1180px; margin:0 auto;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:20px;
+  }
+
+  .reveal{
+    opacity:0; transform:translateY(24px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .reveal.visible{opacity:1; transform:translateY(0);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><span class="logo-mark"></span>Waveline</div>
+    <div class="nav-links">
+      <a href="#packages">Packages</a>
+      <a href="#how">How it works</a>
+      <a href="#locations">Locations</a>
+      <a href="#reviews">Reviews</a>
+    </div>
+    <button class="nav-cta">Book a wash</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow">Hand wash · Est. 2014</div>
+    <h1>Drive in dull.<br>Drive out <span class="accent">gleaming.</span></h1>
+    <p>Waveline is a hand car wash built around one idea: your car should look like the day you bought it, every single visit. No brushes, no shortcuts — just water, foam, and people who care about the finish.</p>
+    <div class="hero-ctas">
+      <button class="btn-primary">Book a wash</button>
+      <a href="#packages"><button class="btn-ghost">See packages</button></a>
+    </div>
+  </div>
+
+  <div class="shine-stage" id="shineStage">
+    <div class="shine-layer layer-dull">
+      <svg class="car-silhouette" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 70 Q20 50 45 48 L60 30 Q70 22 90 22 L130 22 Q145 22 152 32 L165 48 Q182 50 182 68 Q182 76 174 76 L166 76 Q166 64 154 64 Q142 64 142 76 L58 76 Q58 64 46 64 Q34 64 34 76 L26 76 Q20 76 20 70 Z" fill="#3a5560"/>
+        <circle cx="46" cy="76" r="10" fill="#1a2e38"/>
+        <circle cx="154" cy="76" r="10" fill="#1a2e38"/>
+      </svg>
+      <span class="shine-caption">Before</span>
+    </div>
+    <div class="shine-layer layer-shine">
+      <svg class="car-silhouette" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 70 Q20 50 45 48 L60 30 Q70 22 90 22 L130 22 Q145 22 152 32 L165 48 Q182 50 182 68 Q182 76 174 76 L166 76 Q166 64 154 64 Q142 64 142 76 L58 76 Q58 64 46 64 Q34 64 34 76 L26 76 Q20 76 20 70 Z" fill="#5FE0DE"/>
+        <circle cx="46" cy="76" r="10" fill="#0a2028"/>
+        <circle cx="154" cy="76" r="10" fill="#0a2028"/>
+      </svg>
+      <span class="shine-caption">After</span>
+    </div>
+    <div class="shine-hint">Move your cursor to wipe away the dust</div>
+    <div class="cursor-dot" id="cursorDot"></div>
+  </div>
+</section>
+
+<div class="ticket-strip">
+  <div class="ticket-inner">
+    <div class="ticket-stat"><div class="num">40k+</div><div class="label">Cars washed / yr</div></div>
+    <div class="ticket-stat"><div class="num">12 min</div><div class="label">Avg. wash time</div></div>
+    <div class="ticket-stat"><div class="num">4.9★</div><div class="label">Avg. rating</div></div>
+    <div class="ticket-stat"><div class="num">3</div><div class="label">Bay locations</div></div>
+  </div>
+</div>
+
+<section id="packages" class="wrap reveal">
+  <div class="section-head">
+    <div class="eyebrow">Menu board</div>
+    <h2>Pick your wash</h2>
+    <p>Three packages, no upsell games. Every wash includes a hand dry — we don't let your car air-dry into water spots.</p>
+  </div>
+
+  <div class="board">
+    <div class="board-row head">
+      <div>Package</div><div>What's included</div><div>Time</div><div style="text-align:right;">Price</div>
+    </div>
+    <div class="board-row">
+      <div class="pkg-name">Basic Suds</div>
+      <div class="pkg-desc">Foam wash, hand dry, tire shine, interior vacuum.</div>
+      <div class="pkg-time">10–12 min</div>
+      <div class="pkg-price">$14</div>
+    </div>
+    <div class="board-row">
+      <div class="pkg-name">Deluxe Shine<span class="tag">Popular</span></div>
+      <div class="pkg-desc">Everything in Basic, plus clay bar treatment, wheel deep-clean, and interior wipe-down.</div>
+      <div class="pkg-time">18–20 min</div>
+      <div class="pkg-price">$24</div>
+    </div>
+    <div class="board-row">
+      <div class="pkg-name">Premium Gloss</div>
+      <div class="pkg-desc">Everything in Deluxe, plus hand wax, leather conditioning, and door-jamb detailing.</div>
+      <div class="pkg-time">30–35 min</div>
+      <div class="pkg-price">$39</div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="wrap reveal">
+  <div class="section-head">
+    <div class="eyebrow">The process</div>
+    <h2>Three steps, start to finish</h2>
+    <p>Order matters here — this is exactly what happens from the moment you pull in.</p>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <span class="step-num mono">01 — Drive in</span>
+      <h3>Pull up, pick a package</h3>
+      <p>An attendant meets your car at the entrance. Choose your wash on the spot or book ahead online.</p>
+    </div>
+    <div class="step">
+      <span class="step-num mono">02 — Relax</span>
+      <h3>Grab a seat or a coffee</h3>
+      <p>Our lounge has free wifi and coffee while your car goes through hand-wash and dry.</p>
+    </div>
+    <div class="step">
+      <span class="step-num mono">03 — Drive out</span>
+      <h3>Final inspection, then go</h3>
+      <p>We walk the car with you before you leave — if a spot's missed, we fix it right there.</p>
+    </div>
+  </div>
+</section>
+
+<section id="locations" class="wrap reveal">
+  <div class="section-head">
+    <div class="eyebrow">Find a bay</div>
+    <h2>Three locations, one standard</h2>
+  </div>
+  <div class="locations-grid">
+    <div class="loc-card">
+      <h3>Harbor District</h3>
+      <div class="addr">214 Pier Ave</div>
+      <div class="hours mono">Mon–Sun · 7am–8pm</div>
+    </div>
+    <div class="loc-card">
+      <h3>Riverside</h3>
+      <div class="addr">88 Millbrook Rd</div>
+      <div class="hours mono">Mon–Sun · 7am–7pm</div>
+    </div>
+    <div class="loc-card">
+      <h3>North Grove</h3>
+      <div class="addr">1902 Grove St</div>
+      <div class="hours mono">Mon–Sat · 8am–6pm</div>
+    </div>
+  </div>
+</section>
+
+<section id="reviews" class="wrap reveal">
+  <div class="section-head">
+    <div class="eyebrow">Reviews</div>
+    <h2>What regulars say</h2>
+  </div>
+  <div class="testimonial-row">
+    <div class="t-card">
+      <p>I've tried every wash in town — this is the only one that gets the door jambs. Small thing, but it says everything.</p>
+      <div class="who">— Priya M., Harbor District regular</div>
+    </div>
+    <div class="t-card">
+      <p>Fast enough for a weekday lunch break, thorough enough that I stopped washing my own car on weekends.</p>
+      <div class="who">— Daniel K., Riverside</div>
+    </div>
+    <div class="t-card">
+      <p>The hand dry alone is worth it. No more water spots baking into the paint in summer.</p>
+      <div class="who">— Ana R., North Grove</div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="cta-band reveal">
+    <h2>Your car's next best day starts here.</h2>
+    <p>No appointment needed for Basic or Deluxe. Premium Gloss books up on weekends — reserve ahead.</p>
+    <button class="btn-primary">Book a wash</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div><span class="logo" style="font-size:1.1rem;"><span class="logo-mark"></span>Waveline</span></div>
+    <div>© 2026 Waveline Car Wash. All three bays open daily.</div>
+  </div>
+</footer>
+
+<script>
+  // Squeegee shine-wipe interaction
+  const stage = document.getElementById('shineStage');
+  const shineLayer = stage.querySelector('.layer-shine');
+  const dot = document.getElementById('cursorDot');
+  const RADIUS = 120;
+
+  function updateWipe(x, y){
+    shineLayer.style.clipPath = `circle(${RADIUS}px at ${x}px ${y}px)`;
+    dot.style.left = x + 'px';
+    dot.style.top = y + 'px';
+  }
+
+  stage.addEventListener('mousemove', (e)=>{
+    const rect = stage.getBoundingClientRect();
+    dot.style.display = 'block';
+    updateWipe(e.clientX - rect.left, e.clientY - rect.top);
+  });
+  stage.addEventListener('mouseleave', ()=>{
+    dot.style.display = 'none';
+  });
+  stage.addEventListener('touchmove', (e)=>{
+    const rect = stage.getBoundingClientRect();
+    const touch = e.touches[0];
+    updateWipe(touch.clientX - rect.left, touch.clientY - rect.top);
+  }, {passive:true});
+
+  // gentle idle sweep so the effect is discoverable before interaction
+  let idleT = 0;
+  let userInteracted = false;
+  stage.addEventListener('mousemove', ()=>{ userInteracted = true; });
+  stage.addEventListener('touchstart', ()=>{ userInteracted = true; });
+
+  function idleAnim(){
+    if(!userInteracted){
+      idleT += 0.015;
+      const rect = stage.getBoundingClientRect();
+      const x = rect.width/2 + Math.sin(idleT)*rect.width*0.28;
+      const y = rect.height/2 + Math.cos(idleT*0.7)*rect.height*0.18;
+      shineLayer.style.clipPath = `circle(${RADIUS}px at ${x}px ${y}px)`;
+    }
+    requestAnimationFrame(idleAnim);
+  }
+  requestAnimationFrame(idleAnim);
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+      }
+    });
+  }, {threshold:0.15});
+  document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+  // Nav CTA + hero CTA scroll to packages
+  document.querySelectorAll('.nav-cta, .hero-ctas .btn-primary, .cta-band .btn-primary').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.getElementById('packages').scrollIntoView({behavior:'smooth'});
+    });
+  });
+</script>
+
+</body>
+</html>
